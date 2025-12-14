@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    @font-face {
+      font-family: 'TemplateFont'; /* Give your font a descriptive name */
+      src: url('../fonts/DynaPuff-Regular.ttf') format('truetype');
+      font-weight: normal; /* Define font weight if needed */
+      font-style: normal; /* Define font style if needed */
+    }
+</style>
+<style>
+    :root {
+        --template-width-iphone: 2736px;
+        --template-height-iphone: 1260px;
+        --template-width-ipad: 2752px;
+        --template-height-ipad: 2064px;
+        --template-background-color: #00afb9;
+        --template-header-text-color: #ffffff;
+        --template-header-font-size: 125px;
+        --template-screenshot-outline-color: #ccd5ae;
+    }
+    body {
+        margin: 0;
+    }
+    div.template_frame {
+        background-color: var(--template-background-color);
+        overflow: hidden;
+        /* border: 1px solid black; */
+    }
+    .template_frame_iphone {
+        width: var(--template-width-iphone);
+        height: var(--template-height-iphone);
+    }
+    .template_frame_ipad {
+        width: var(--template-width-ipad);
+        height: var(--template-height-ipad);
+    }
+    .header_text {
+        font-family: 'TemplateFont';
+        font-size: var(--template-header-font-size);
+        font-weight: normal;
+        font-style: normal;
+        text-align: center;
+        letter-spacing: normal;
+        word-spacing: normal;
+        color: var(--template-header-text-color); /* #faedcd; */
+        /* border: 1px solid black; */
+    }
+    .header_text_iphone {
+        padding-top: 40px;
+        padding-bottom: 30px;
+    }
+    .header_text_ipad {
+        padding-top: 60px;
+        padding-bottom: 60px;
+    }
+    .screenshot {
+        display: block;
+        height: auto;
+        margin-left: auto;
+        margin-right: auto;
+        border: 30px solid var(--template-screenshot-outline-color);
+        border-radius: 120px;
+    }
+    .screenshot_iphone {
+        max-width: 75%;
+    }
+    .screenshot_ipad {
+        max-width: 80%;
+    }
+
+    label {
+        font-size: 100px;
+    }
+
+    input {
+        font-size: 100px;
+    }
+
+    button {
+        font-size: 100px;
+    }
+
+    select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        padding: 15px;
+        font-size: 100px;
+    }
+</style>
+
+<script>
+
+    let selectedDevice = 'iphone'
+
+    let options = {
+        "example_1": {
+            "text": "Learn and practice basic math",
+            "color": "#00afb9"
+        },
+        "example_1_entry": {
+            "text": "Hand written input",
+            "color": "#f9c74f"
+        },
+        "example_1_success": {
+            "text": "Instant feedback",
+            "color": "#90be6d"
+        },
+        "example_2": {
+            "text": "Randomly generated problems",
+            "color": "#6096ba"
+        },
+        "example_3": {
+            "text": "Increasing complexity",
+            "color": "#f07167"
+        },
+        "level_1": {
+            "text": "Practice a wide variety of problems",
+            "color": "#8fb996"
+        },
+        "level_2": {
+            "text": "Practice a wide variety of problems",
+            "color": "#ffba08"
+        },
+        "level_3_locked": {
+            "text": "Subscribe to unlock all content",
+            "color": "#a3cef1"
+        },
+        "home": {
+            "text": "Child friendly interface",
+            "color": "#fed9b7"
+        },
+        "stats": {
+            "text": "Review your progress",
+            "color": "#a1cca5"
+        },
+    }
+
+    const templateBackgroundColors = [
+        '#f9c74f',
+        '#4d908e',
+        '#e07a5f',
+        '#00afb9',
+        '#f07167',
+        '#f49cbb',
+        '#6096ba',
+        '#ffba08',
+        '#a3cef1',
+        '#fed9b7',
+        '#a1cca5',
+        '#8fb996',
+        '#90be6d',
+        '#f9844a',
+        '#cdb4db',
+    ]
+
+    function populateAndListenToOptionsChanges() {
+        const optionSelect = document.getElementById('template_option_select');
+
+        Object.keys(options).forEach(key => {
+            optionSelect.innerHTML += `<option value="${key}">${key}</option>`;
+        });
+
+        // Add an event listener for the 'change' event
+        optionSelect.addEventListener('change', function() {
+            // This function will be executed when the selected option changes
+            const selectedOptionValue = this.value; // 'this' refers to the select element
+            console.log('Selected option value: ', selectedOptionValue);
+
+            let text = options[selectedOptionValue].text
+            let color = options[selectedOptionValue].color
+            updateColor(color)
+            updateHeaderText(text)
+            updateScreenshot(selectedOptionValue + '.png')
+        });
+    }
+
+    function listenToHeaderTextSelectChanges() {
+        const headerTextSelect = document.getElementById('template_header_text_select');
+
+        // Add an event listener for the 'change' event
+        headerTextSelect.addEventListener('change', function() {
+          // This function will be executed when the selected option changes
+          const selectedValue = this.value; // 'this' refers to the select element
+          console.log('Selected value:', selectedValue);
+
+          // You can also get the selected text:
+          const selectedText = this.options[this.selectedIndex].text;
+          console.log('Selected text:', selectedText);
+
+          updateHeaderText(selectedText)
+        });
+    }
+
+    function listenToScreenshotSelectChanges() {
+        const screenshotSelect = document.getElementById('template_screenshot_select');
+
+        // Add an event listener for the 'change' event
+        screenshotSelect.addEventListener('change', function() {
+          // This function will be executed when the selected option changes
+          const selectedValue = this.value; // 'this' refers to the select element
+          console.log('Selected screenshot value:', selectedValue);
+
+          // You can also get the selected text:
+          const selectedFile = this.options[this.selectedIndex].text;
+          console.log('Selected file:', selectedFile);
+
+          updateScreenshot(selectedFile)
+        });
+    }
+
+    function updateScreenshot(name) {
+        const screenshot = document.getElementById('screenshot');
+        screenshot.src = '../images/' + selectedDevice + '/' + name;
+    }
+
+    function listenToDeviceSelectChanges() {
+        const deviceSelect = document.getElementById('template_device_select');
+
+        // Add an event listener for the 'change' event
+        deviceSelect.addEventListener('change', function() {
+            // This function will be executed when the selected option changes
+            const selectedDeviceValue = this.value; // 'this' refers to the select element
+            console.log('Selected device value:', selectedDeviceValue);
+
+            selectedDevice = selectedDeviceValue
+            onDeviceSelected(selectedDeviceValue)
+        });
+    }
+
+    function onDeviceSelected() {
+        updateTemplateFrameClass()
+        updateHeaderTextClass()
+        updateScreenshotClass()
+    }
+
+    function updateTemplateFrameClass() {
+        const templateFrame = document.getElementById('template_frame');
+
+        templateFrame.classList.remove('template_frame_iphone');
+        templateFrame.classList.remove('template_frame_ipad');
+        if (selectedDevice == 'ipad') {
+            templateFrame.classList.add('template_frame_ipad');
+        } else {
+            templateFrame.classList.add('template_frame_iphone');
+        }
+    }
+
+    function updateHeaderTextClass() {
+        const headerText = document.getElementById('template_header_text');
+
+        headerText.classList.remove('header_text_iphone');
+        headerText.classList.remove('header_text_ipad');
+        if (selectedDevice == 'ipad') {
+            headerText.classList.add('header_text_ipad');
+        } else {
+            headerText.classList.add('header_text_iphone');
+        }
+    }
+
+    function updateScreenshotClass() {
+        const screenshot = document.getElementById('screenshot');
+
+        screenshot.classList.remove('screenshot_iphone');
+        screenshot.classList.remove('screenshot_ipad');
+        if (selectedDevice == 'ipad') {
+            screenshot.classList.add('screenshot_ipad');
+        } else {
+            screenshot.classList.add('screenshot_iphone');
+        }
+    }
+
+    function ready(fn) {
+      if (document.readyState !== 'loading') {
+        fn();
+      } else {
+        document.addEventListener('DOMContentLoaded', fn);
+      }
+    }
+
+    function updateColor(color) {
+        document.getElementById('template_frame').style.backgroundColor = color;
+    }
+
+    function updateHeaderText(text) {
+        const headerText = document.getElementById('template_header_text');
+
+        headerText.textContent = text
+    }
+
+    function populateColorSelectTable() {
+        const colorSelectionTableRow = document.getElementById('template_color_select_table_row')
+        for (let i = 0; i < templateBackgroundColors.length; i++) {
+            let color = templateBackgroundColors[i];
+            colorSelectionTableRow.innerHTML += `<td onclick="updateColor('${color}')" title="${color}" style="width: 100px; height: 100px; background: ${color};"></td>`;
+        }
+    }
+
+    function applyCustomText() {
+        const customTextInput = document.getElementById('template_header_text_custom_input')
+        const headerText = document.getElementById('template_header_text');
+
+        headerText.textContent = customTextInput.value
+    }
+
+    ready(populateColorSelectTable)
+    ready(listenToHeaderTextSelectChanges)
+    ready(listenToScreenshotSelectChanges)
+    ready(listenToDeviceSelectChanges)
+    ready(onDeviceSelected)
+    ready(populateAndListenToOptionsChanges)
+
+</script>
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Template - Base</title>
+</head>
+<body>
+
+    <div class="template_frame template_frame_iphone" id="template_frame">
+        <div class="header_text" id="template_header_text">Learn and practice basic math</div>
+
+        <img class="screenshot" id="screenshot" src="../images/iphone/home.png"/>
+    </div>
+
+    <div style="height: 100px;"></div>
+
+    <div id="controls_container">
+
+        <table id="template_color_select_table">
+            <tr id="template_color_select_table_row">
+            </tr>
+        </table>
+
+        <div style="height: 100px;"></div>
+
+        <label for="template_option_select">Choose an option:</label>
+
+        <select name="template_option_select" id="template_option_select">
+        </select>
+
+        <div style="height: 100px;"></div>
+
+        <label for="template_device_select">Choose a device:</label>
+
+        <select name="template_device_select" id="template_device_select">
+            <option value="iphone">iPhone (2736 x 1260)</option>
+            <option value="ipad">iPad (2752 x 2064)</option>
+        </select>
+
+
+        <div style="height: 100px;"></div>
+
+        <label for="template_header_text_select">Choose a header:</label>
+
+        <select name="template_header_text_select" id="template_header_text_select">
+            <option value="home2">Fun way to learn math</option>
+            <option value="level1_1">Variety of problems to practice</option>
+            <option value="level2">Different levels of complexity</option>
+            <option value="example_1">Start with simple problems</option>
+            <option value="example_3">From simple to complex</option>
+            <option value="level_1">Learn and practice basic math</option>
+            <option value="input">Hand written input</option>
+            <option value="example_2_success">Instant feedback</option>
+            <option value="example_2">Randomly generated problems</option>
+            <option value="level2_1">Increasing complexity</option>
+            <option value="level1">Practice a wide variety of problems</option>
+            <option value="level_locked">Subscribe to unlock all content</option>
+            <option value="example_1_1">Child friendly interface</option>
+            <option value="stats">Review your progress</option>
+        </select>
+
+        <div style="height: 100px;"></div>
+
+        <label for="template_header_text_custom_input">Custom header:</label>
+
+        <input type="text" id="template_header_text_custom_input">
+
+        <button onclick="applyCustomText()">Apply</button>
+
+        <div style="height: 100px;"></div>
+
+        <label for="template_screenshot_select">Choose a screenshot:</label>
+
+        <select name="template_screenshot_select" id="template_screenshot_select">
+            <option value="example_1">example_1.png</option>
+            <option value="example_1_entry">example_1_entry.png</option>
+            <option value="example_1_success">example_1_success.png</option>
+            <option value="example_2">example_2.png</option>
+            <option value="example_3">example_3.png</option>
+            <option value="level_1">level_1.png</option>
+            <option value="level_2">level_2.png</option>
+            <option value="level_3_locked">level_3_locked.png</option>
+            <option value="home">home.png</option>
+            <option value="stats">stats.png</option>
+        </select>
+
+        <div style="height: 100px;"></div>
+    </div>
+</body>
+</html>
